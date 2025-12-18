@@ -1,0 +1,6 @@
+@SistemaGeneral_HostAddress = http://localhost:5045
+
+GET {{SistemaGeneral_HostAddress}}/Users/1
+Accept: application/json
+
+###
