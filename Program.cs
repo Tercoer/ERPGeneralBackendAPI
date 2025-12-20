@@ -42,7 +42,7 @@ builder.Services.AddSwaggerGen((c) => {
         }
     });
 });
-builder.Services.AddScoped<DB>();
+builder.Services.AddSingleton<DB>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<PermissionService>();
@@ -77,6 +77,16 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseExceptionHandler(errorApp => {
+    errorApp.Run(async context => {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsJsonAsync(new {
+            error = "Internal server error"
+        });
+    });
+});
+
+
 
 //app.MapGet("/prueba", Users.prueba);
 app.MapGet("/ConexionDb", (DB db) => {
@@ -102,8 +112,18 @@ app.MapPermissionEndpoints();
 app.Run();
 
 /*########################        SIGUIENTES PASOS            #############################
- *
- *
+ * CAMBIAR LA ESTRUCTURA A SIN TRY CATCH
+ * app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = "Internal server error"
+            });
+        });
+    });
  *
  *
  *

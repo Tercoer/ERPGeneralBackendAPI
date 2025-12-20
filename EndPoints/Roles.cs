@@ -21,23 +21,32 @@ namespace SistemaGeneral.EndPoints {
             return await role.DeleteRoleAsync(id);
         }
 
-        private static async Task<object?> PatchRole(RoleService role, [FromBody] ModelRole model) {
-            return await role.PatchRoleAsync(model);
+        private static async Task<IResult> PatchRole(RoleService role, [FromBody] ModelRole model) {
+            ModelRole? res = await role.PatchRoleAsync(model);
+            if(res == null)
+                return Results.NotFound();
+            return Results.Ok(res);
         }
 
-        private static async Task<object?> AddRole(RoleService role, [FromBody] ModelRoleDto model) {
-            return await role.AddRoleAsync(model);
+        private static async Task<IResult?> AddRole(RoleService role, [FromBody] ModelRoleDto model) {
+            ModelRole? result = await role.AddRoleAsync(model);
+            if(result == null)
+                return Results.NotFound();
+            return Results.Ok(result);
         }
 
-        private static async Task<IResult?> GetRole(RoleService role, [FromRoute] byte id) {
+        private static async Task<IResult> GetRole(RoleService role, [FromRoute] byte id) {
             ModelRole? result = await role.GetRoleAsync(id);
             if(result == null)
                 return Results.NotFound();
             return Results.Ok(result);
         }
 
-        private static async Task<IResult?> GetRoles(RoleService role) {
-            return await role.GetRolesAsync();
+        private static async Task<IResult> GetRoles(RoleService role) {
+            List<ModelRole> roles = await role.GetRolesAsync();
+            if(roles == null || roles.Count == 0)
+                return Results.NotFound();
+            return Results.Ok(roles);
         }
     }
 }

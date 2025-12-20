@@ -6,19 +6,19 @@ namespace SistemaGeneral.Services {
         public IConfiguration? _configuration;
 
         public DB(IConfiguration configuration) {
-            _configuration = configuration;            
+            _configuration = configuration;
         }
 
-        public SqlConnection? GetConnection() {
-            try {
-                SqlConnection conn = new SqlConnection(_configuration?.GetConnectionString("DefaultConnection"));
-                conn.Open();
-                return conn;
-            }
-            catch(Exception ex) {
-                Console.WriteLine(ex);
-                return null;
-            }
+        public async Task<SqlConnection> GetConnectionAsync() {
+            SqlConnection conn = new SqlConnection(_configuration?.GetConnectionString("DefaultConnection"));
+            await conn.OpenAsync();
+            return conn;
+        }
+
+        public SqlConnection GetConnection() {
+            SqlConnection conn = new SqlConnection(_configuration?.GetConnectionString("DefaultConnection"));
+            conn.Open();
+            return conn;
         }
     }
 }

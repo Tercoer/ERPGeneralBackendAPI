@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Data.SqlClient;
 using SistemaGeneral.Models;
 using SistemaGeneral.Security;
 using SistemaGeneral.Utility;
@@ -12,133 +14,79 @@ namespace SistemaGeneral.Services {
             _db = db;
         }
 
-        public Task<object?> AddRoleAsync(ModelRoleDto model) {
-            object? result = null;
-            try {
-                using(SqlConnection? conn = _db.GetConnection()) {
-                    using(SqlCommand cmd = new SqlCommand()) {
-                        cmd.Connection = conn;
-                        cmd.CommandText = "SELECT ISNULL(MAX(Id), 0) + 1 FROM Roles";
-                        int id = (int)cmd.ExecuteScalar();
+        public async Task<ModelRole?> AddRoleAsync(ModelRoleDto model) {
+            await using SqlConnection? conn = await _db.GetConnectionAsync();
 
-                        cmd.CommandText = "INSERT INTO Roles (Id, Name, Description, IsEnabled) " +
-                                          "VALUES (@Id, @Name, @Description, 'True')";
-                        cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
-                        cmd.Parameters.Add("@Name", SqlDbType.VarChar, 20).Value = model.Name;
-                        cmd.Parameters.Add("@Description", SqlDbType.VarChar, 50).Value = model.Description;
-                        cmd.ExecuteNonQuery();
+            string cmd = "INSERT INTO Roles (Name, Description, IsEnabled) " +
+                         "OUTPUT INSERTED.Id " +
+                         "VALUES (@Name, @Description, 1)";
+            object? id = await conn.ExecuteScalarAsync(cmd, model);
 
-                        result = new {
-                            Id = id,
-                            model.Name,
-                            model.Description,
-                            IsEnabled = true,
-                        };
+            if(id == null)
+                return null;
 
-                    }
-                }
-            }
-            catch(Exception ex) {
-                Console.WriteLine(ex.Message);
-                result = null;
-            }
-            return Task.FromResult(result);
+            return new ModelRole {
+                Id = (byte)id,
+                Name = model.Name,
+                Description = model.Description,
+                IsEnabled = true,
+            };
         }
 
-        public Task<ModelRole?> GetRoleAsync(byte id) {
-            ModelRole? model = null;
-            SqlDataReader? reader = null;
-            try {
-                using(SqlConnection? conn = _db.GetConnection()) {
-                    using(SqlCommand cmd = new SqlCommand()) {
-                        cmd.Connection = conn;
-                        cmd.CommandText = "SELECT Name, Description, IsEnabled " +
-                                          "FROM Roles " +
-                                          "WHERE Id = @Id ";
-                        cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
-                        reader = cmd.ExecuteReader();
-                        if(reader != null && reader.Read()) {
-                            model = new ModelRole();
-                            model.Id = id;
-                            model.Name = reader.SafeString(0);
-                            model.Description = reader.SafeString(1);
-                            model.IsEnabled = reader.SafeBool(2);
-                        }
-                    }
-                }
-            }
-            catch(Exception ex) {
-                Console.WriteLine(ex);
-                model = null;
-            }
+        public async Task<ModelRole?> GetRoleAsync(byte id) {
 
-            return Task.FromResult(model);
+            using SqlConnection? conn = await _db.GetConnectionAsync();
+            using SqlCommand cmd = conn.CreateCommand();
+
+            cmd.CommandText = "SELECT Name, Description, IsEnabled " +
+                                "FROM Roles " +
+                                "WHERE Id = @Id ";
+            cmd.Parameters.Add("@Id", SqlDbType.TinyInt).Value = id;
+
+            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            if(!await reader.ReadAsync())
+                return null;
+            return new ModelRole() {
+                Id = id,
+                Name = reader.SafeString(0),
+                Description = reader.SafeString(1),
+                IsEnabled = reader.SafeBool(2)
+            };
         }
 
-        public async Task<IResult?> GetRolesAsync() {
-            List<ModelRole>? list = null;
-            SqlDataReader? reader = null;
-            try {
-                using(SqlConnection? conn = _db.GetConnection()) {
-                    using(SqlCommand cmd = new SqlCommand()) {
-                        cmd.Connection = conn;
-                        cmd.CommandText = "SELECT Id, Name, Description, IsEnabled " +
-                                          "FROM Roles ";
-                        reader = cmd.ExecuteReader();
-                        if(reader != null) {
-                            list = new List<ModelRole>();
-                            while(reader.Read()) {
-                                ModelRole model = new ModelRole();
-                                model.Id = reader.SafeByte(0);
-                                model.Name = reader.SafeString(1);
-                                model.Description = reader.SafeString(2);
-                                model.IsEnabled = reader.SafeBool(3);
-                                list.Add(model);
-                            }
-                        }
-                    }
-                }
+        public async Task<List<ModelRole>> GetRolesAsync() {
+
+            using SqlConnection? conn = await _db.GetConnectionAsync();
+            using SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "SELECT Id, Name, Description, IsEnabled " +
+                              "FROM Roles ";
+            SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            List<ModelRole> list = new List<ModelRole>();
+            while(await reader.ReadAsync()) {
+                ModelRole model = new ModelRole();
+                model.Id = reader.SafeByte(0);
+                model.Name = reader.SafeString(1);
+                model.Description = reader.SafeString(2);
+                model.IsEnabled = reader.SafeBool(3);
+                list.Add(model);
             }
-            catch(Exception ex) {
-                Console.WriteLine(ex);
-                list = null;
-            }
-            IResult res = Results.Ok(list);
-            return await Task.FromResult(res);
+            return list;
         }
 
-        public Task<object?> PatchRoleAsync(ModelRole model) {
-            object? result = null;
-            try {
-                using(SqlConnection? conn = _db.GetConnection()) {
-                    using(SqlCommand cmd = new SqlCommand()) {
-                        cmd.Connection = conn;
-                        cmd.CommandText = "UPDATE Roles " +
-                                          "SET Name = @Name, Description = @Description " +
-                                          "IsEnabled = @IsEnabled " +
-                                          "WHERE Id = @Id";
+        public async Task<ModelRole?> PatchRoleAsync(ModelRole model) {
+            using SqlConnection? conn = await _db.GetConnectionAsync();
+            
+            string cmd = "UPDATE Roles " +
+                         "SET Name = @Name, Description = @Description, " +
+                         "IsEnabled = @IsEnabled " +
+                         "WHERE Id = @Id";
 
-                        cmd.Parameters.Add("@Id", SqlDbType.TinyInt).Value = model.Id;
-                        cmd.Parameters.Add("@Name", SqlDbType.VarChar, 20).Value = model.Name;
-                        cmd.Parameters.Add("@Description", SqlDbType.VarChar, 50).Value = model.Description;
-                        cmd.Parameters.Add("@IsEnabled", SqlDbType.Bit).Value = model.IsEnabled;
-                        
-                        if(cmd.ExecuteNonQuery() > 0) {
-                            result = new {
-                                model.Id,
-                                model.Name,
-                                model.Description,
-                                model.IsEnabled
-                            };
-                        }
-                    }
-                }
-            }
-            catch(Exception ex) {
-                Console.WriteLine(ex.Message);
-                result = null;
-            }
-            return Task.FromResult(result);
+            if(await conn.ExecuteAsync(cmd, model) < 1) 
+                return null;
+            
+            return model;
         }
 
         public Task<bool> DeleteRoleAsync(byte id) {
