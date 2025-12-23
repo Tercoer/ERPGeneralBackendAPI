@@ -126,6 +126,10 @@ app.Run();
     });
  *
  *
+ * SE COMPLETO EL ARCHIVO DE ROLES USANDO DAPPER ****
+ * 
+ * COMPLETAR EL ARCHIVO DE USUARIO USANDO DAPPER
+ * FINALIZAR EL MODULO DE USERS CON VALIDACIONES
  *
  *########################        SIGUIENTES PASOS            #############################*/
 

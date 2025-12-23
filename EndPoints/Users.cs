@@ -2,6 +2,8 @@
 using SistemaGeneral.Services;
 using SistemaGeneral.Models;
 using System.Threading.Tasks;
+using System.Collections;
+using SistemaGeneral.Utility;
 
 namespace SistemaGeneral.EndPoints {
     public static class Users {
@@ -18,28 +20,35 @@ namespace SistemaGeneral.EndPoints {
             return group;
         }
 
-        private static async Task<object?> AddUser(UserService users, [FromBody] ModelUserAddDto model) {            
-            return await users.AddUserAsync(model);
+        private static async Task<IResult> AddUser(UserService service, [FromBody] ModelUserAddDto model) {
+            bool isUserCreated = await service.AddUserAsync(model);
+            return ResultsValidator.CreatedResult(isUserCreated, $"/{model}");
         }
 
-        private static async Task<ModelUserInfoDto?> GetUser(UserService users, [FromRoute] int id) {
-            return await users.GetUserAsync(id);
+        private static async Task<IResult> GetUser(UserService service, [FromRoute] int id) {
+            ModelUserInfoDto? user = await service.GetUserAsync(id);
+            return ResultsValidator.GetResult(user);
         }
 
-        private static async Task<List<ModelUserInfoDto>?> GetUsers(UserService users) {
-            return await users.GetUsersAsync();
+        private static async Task<IResult> GetUsers(UserService service) {
+            IEnumerable<ModelUserInfoDto> users = await service.GetUsersAsync();
+            return ResultsValidator.GetResult(users);
         }
 
-        public static async Task<object?> PatchUser(UserService users, [FromBody] ModelUser model) {
-            return await users.PatchUserAsync(model);
+        public static async Task<IResult?> PatchUser(UserService users, [FromBody] ModelUserUpdateInputDto model) {
+            bool isUserUpdated = await users.PatchUserAsync(model);
+            return ResultsValidator.UpdatedResult(isUserUpdated);
         }
 
-        public static async Task<object?> PatchUserRole(UserService users, [FromBody] PatchModelUserRoleDto model) {
-            return await users.PatchUserRoleAsync(model);
+        public static async Task<IResult?> PatchUserRole(UserService users, [FromBody] PatchModelUserRoleDto model) {
+            bool isUserRoleUpdated = await users.PatchUserRoleAsync(model);
+            return ResultsValidator.UpdatedResult(isUserRoleUpdated);
         }
 
-        public static async Task<bool> DeleteUser(UserService users, [FromRoute] int id) {
-            return await users.DeleteUserAsync(id);
+        public static async Task<IResult> DeleteUser(UserService users, [FromRoute] int id) {
+            bool isUserDeleted = await users.DeleteUserAsync(id);
+            return ResultsValidator.DeletedResult(isUserDeleted);
+
         }
 
     }

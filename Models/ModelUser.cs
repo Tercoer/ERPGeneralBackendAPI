@@ -20,6 +20,7 @@
     }
 
     public class ModelUserAddDto {
+        public byte RoleId { get; set; } = 0;
         public string Username { get; set; } = "";
         public string InputPassword { get; set; } = "";
         public string Email { get; set; } = "";

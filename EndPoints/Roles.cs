@@ -28,7 +28,7 @@ namespace SistemaGeneral.EndPoints {
             return Results.Ok(res);
         }
 
-        private static async Task<IResult?> AddRole(RoleService role, [FromBody] ModelRoleDto model) {
+        private static async Task<IResult> AddRole(RoleService role, [FromBody] ModelRoleDto model) {
             ModelRole? result = await role.AddRoleAsync(model);
             if(result == null)
                 return Results.NotFound();
@@ -43,8 +43,8 @@ namespace SistemaGeneral.EndPoints {
         }
 
         private static async Task<IResult> GetRoles(RoleService role) {
-            List<ModelRole> roles = await role.GetRolesAsync();
-            if(roles == null || roles.Count == 0)
+            IEnumerable<ModelRole> roles = await role.GetRolesAsync();
+            if(!roles.Any())
                 return Results.NotFound();
             return Results.Ok(roles);
         }
