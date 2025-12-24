@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SistemaGeneral.Models;
 using SistemaGeneral.Services;
+using SistemaGeneral.Utility;
+using System.Collections;
 
 namespace SistemaGeneral.EndPoints {
     public static class Permissions {
@@ -23,38 +25,46 @@ namespace SistemaGeneral.EndPoints {
 
         /************ PERMISION ROUTES ************/
 
-        private static async Task<ModelPermission?> GetPermissionAsync(PermissionService service, [FromRoute] short id) {
-            return await service.GetPermissionAsync(id);
+        private static async Task<IResult> GetPermissionAsync(PermissionService service, [FromRoute] short id) {
+            IEnumerable<ModelPermission> permisions = await service.GetPermissionAsync(id);
+            return ResultsValidator.GetResult(permisions);
         }
 
-        private static async Task<List<ModelPermission>?> GetPermissionsAsync(PermissionService service) {
-            return await service.GetPermissionsAsync();
+        private static async Task<IResult> GetPermissionsAsync(PermissionService service) {
+            IEnumerable<ModelPermission> permisions = await service.GetPermissionsAsync();
+            return ResultsValidator.GetResult(permisions);
         }
 
-        private static async Task<object?> AddPermissionAsync(PermissionService service, [FromBody] ModelPermissionDto model) {
-            return await service.AddPermissionAsync(model);
+        private static async Task<IResult> AddPermissionAsync(PermissionService service, [FromBody] ModelPermissionDto model) {
+            bool isPermissionAdded = await service.AddPermissionAsync(model);
+            return ResultsValidator.CreatedResult(isPermissionAdded);
         }
 
-        private static async Task<object?> PatchPermissionAsync(PermissionService service, [FromBody] ModelPermission model) {
-            return await service.PatchPermissionAsync(model);
+        private static async Task<IResult> PatchPermissionAsync(PermissionService service, [FromBody] ModelPermission model) {
+            bool isPermissionUpdated = await service.PatchPermissionAsync(model);
+            return ResultsValidator.UpdatedResult(isPermissionUpdated);
         }
 
-        private static async Task<bool> DeletePermissionAsync(PermissionService service, [FromRoute] byte id) {
-            return await service.DeletePermissionAsync(id);
+        private static async Task<IResult> DeletePermissionAsync(PermissionService service, [FromRoute] byte id) {
+            bool isPermissionDeleted = await service.DeletePermissionAsync(id);
+            return ResultsValidator.DeletedResult(isPermissionDeleted);
         }
 
         /************ ROLE_PERMISION ROUTES ************/
 
-        private static async Task<List<ModelPermission>?> GetPermissionsByRoleAsync(PermissionService service, [FromRoute] byte id) {
-            return await service.GetPermissionsByRoleAsync(id);
+        private static async Task<IResult> GetPermissionsByRoleAsync(PermissionService service, [FromRoute] byte id) {
+            IEnumerable permissionsByRole = await service.GetPermissionsByRoleAsync(id);
+            return ResultsValidator.GetResult(permissionsByRole);
         }
 
-        private static async Task<object?> AddRolePermissionAsync(RolePermissionService service, [FromBody] ModelRolePermission model) {
-            return await service.AddRolePermissionAsync(model);
+        private static async Task<IResult> AddRolePermissionAsync(RolePermissionService service, [FromBody] ModelRolePermission model) {
+            bool isRolePermissionAdded = await service.AddRolePermissionAsync(model);
+            return ResultsValidator.CreatedResult(isRolePermissionAdded);
         }
 
-        private static async Task<bool> DeleteRolePermissionAsync(RolePermissionService service, [FromBody] ModelRolePermission model) {
-            return await service.DeleteRolePermissionAsync(model);
+        private static async Task<IResult> DeleteRolePermissionAsync(RolePermissionService service, [FromBody] ModelRolePermission model) {
+            bool isRolePermissionDeleted = await service.DeleteRolePermissionAsync(model);
+            return ResultsValidator.DeletedResult(isRolePermissionDeleted);
         }
 
     }

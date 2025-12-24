@@ -22,14 +22,14 @@ namespace SistemaGeneral.Utility {
             return success ? Results.NoContent() : Results.NotFound();
         }
 
-        public static IResult CreatedResult<T>(T? result, string location) {
-            if(result == null)
-                return Results.BadRequest(CreateProblem(
+        public static IResult CreatedResult(bool success) {
+            if(success)
+                return Results.Created();
+            return Results.BadRequest(CreateProblem(
                     StatusCodes.Status400BadRequest,
-                    "No se pudo crear el recurso"
-                ));
+                    "Fail creating resource"
+            ));
 
-            return Results.Created(location, result);
         }
 
         private static ProblemDetails CreateProblem(int status, string title) {

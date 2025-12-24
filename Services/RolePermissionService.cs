@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using SistemaGeneral.EndPoints;
 using SistemaGeneral.Models;
 using SistemaGeneral.Utility;
@@ -12,61 +13,20 @@ namespace SistemaGeneral.Services {
             _db = db;
         }
 
-        public Task<object> AddRolePermissionAsync(ModelRolePermission model) {
-            object result;
-            try {
-                using(SqlConnection? conn = _db.GetConnection()) {
-                    using(SqlCommand cmd = new SqlCommand()) {
-                        cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO RolesPermissions (RoleId, PermissionId) " +
-                                          "VALUES (@RoleId, @PermissionId)";
-                        cmd.Parameters.Add("@RoleId", SqlDbType.TinyInt).Value = model.RoleId;
-                        cmd.Parameters.Add("@PermissionId", SqlDbType.SmallInt).Value = model.PermisisonId;
-                        cmd.ExecuteNonQuery();
+        public async Task<bool> AddRolePermissionAsync(ModelRolePermission model) {                    
+            using SqlConnection? conn = await _db.GetConnectionAsync();
+            string cmd = @"INSERT INTO RolesPermissions (RoleId, PermissionId) 
+                           VALUES (@RoleId, @PermissionId)";
 
-                        result = new {
-                            model.RoleId,
-                            model.PermisisonId
-                        };
-
-                    }
-                }
-            }
-            catch(SqlException ex) {
-                result = new {
-                    ErrorNumber = ex.Number,
-                    Error = "A SqlException has occurred"
-                };
-            }
-            catch(Exception ex) {
-                result = new {
-                    ErrorNumber = ex.HResult,
-                    Error = "A non controlled exception by the system has occurred"
-                };
-            }
-            return Task.FromResult(result);
+            return await conn.ExecuteAsync(cmd, model) > 0;
         }
 
-        public Task<bool> DeleteRolePermissionAsync(ModelRolePermission model) {
-            bool result = false;
-            try {
-                using(SqlConnection? conn = _db.GetConnection()) {
-                    using(SqlCommand cmd = new SqlCommand()) {
-                        cmd.Connection = conn;
-                        cmd.CommandText = "DELETE FROM RolesPermissions " +
-                                          "WHERE RoleId = @RoleId AND PermissionId = @PermissionId";
-                        cmd.Parameters.Add("@RoleId", SqlDbType.TinyInt).Value = model.RoleId;
-                        cmd.Parameters.Add("@PermissionId", SqlDbType.SmallInt).Value = model.PermisisonId;
-                        result = cmd.ExecuteNonQuery() > 0;
-                    }
-                }
+        public async Task<bool> DeleteRolePermissionAsync(ModelRolePermission model) {
+            using SqlConnection? conn = await _db.GetConnectionAsync();
+            string cmd  = @"DELETE FROM RolesPermissions 
+                            WHERE RoleId = @RoleId AND PermissionId = @PermissionId";
 
-            }
-            catch(Exception ex) {
-                Console.WriteLine(ex);
-            }
-
-            return Task.FromResult(result);
+            return await conn.ExecuteAsync(cmd, model) > 0;
         }
 
 

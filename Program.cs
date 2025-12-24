@@ -130,6 +130,6 @@ app.Run();
  * 
  * COMPLETAR EL ARCHIVO DE USUARIO USANDO DAPPER
  * FINALIZAR EL MODULO DE USERS CON VALIDACIONES
- *
+ * TERMINAR DE HACER PRUEBAS AL MODULO DE PERMISOS
  *########################        SIGUIENTES PASOS            #############################*/
 
