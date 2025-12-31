@@ -47,6 +47,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<RolePermissionService>();
+builder.Services.AddScoped<ProductsService>();
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -78,7 +79,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler(errorApp => {
-    errorApp.Run(async context => {
+    errorApp.Run(async context => { 
         context.Response.StatusCode = 500;
         await context.Response.WriteAsJsonAsync(new {
             error = "Internal server error"
@@ -107,7 +108,7 @@ app.MapGet("/recursoPrivado", [Authorize](ClaimsPrincipal user) => {
 app.MapUserEndpoints();
 app.MapRoleEndpoints();
 app.MapPermissionEndpoints();
-
+app.MapProductsEndPoint();
 
 app.Run();
 
@@ -126,10 +127,8 @@ app.Run();
     });
  *
  *
- * SE COMPLETO EL ARCHIVO DE ROLES USANDO DAPPER ****
+ * Agregar el modulo de Products
  * 
- * COMPLETAR EL ARCHIVO DE USUARIO USANDO DAPPER
- * FINALIZAR EL MODULO DE USERS CON VALIDACIONES
- * TERMINAR DE HACER PRUEBAS AL MODULO DE PERMISOS
+ * 
  *########################        SIGUIENTES PASOS            #############################*/
 

@@ -50,7 +50,7 @@ namespace SistemaGeneral.Services {
 
         public async Task<bool> PatchPermissionAsync(ModelPermission model) {
             using SqlConnection? conn = await _db.GetConnectionAsync();
-            string cmd = @"UPDATE Roles 
+            string cmd = @"UPDATE Permissions 
                            SET Name = @Name, Description = @Description 
                            WHERE Id = @Id";
 
