@@ -10,8 +10,10 @@ namespace SistemaGeneral.EndPoints {
         public static RouteGroupBuilder MapProductsEndPoint(this IEndpointRouteBuilder app) {
             RouteGroupBuilder group = app.MapGroup("/products");
             group.MapGet("/", GetProducts);
+            group.MapGet("/{id}", GetProductByID);
             group.MapPost("/{model}", AddProduct);
-
+            group.MapPatch("{model}", PatchProduct);
+            group.MapDelete("/{id}", DeleteProduct);
             return group;
         }
         
@@ -19,15 +21,26 @@ namespace SistemaGeneral.EndPoints {
             IEnumerable<ModelProducts> products = await service.GetProductsAsync();
             return ResultsValidator.GetResult(products);
         }
+        public static async Task<IResult> GetProductByID(ProductsService service, int id) {
+            ModelProducts product = await service.GetProductByID(id);
+            return ResultsValidator.GetResult(product);
+        }
 
         public static async Task<IResult> AddProduct(ProductsService service, [FromBody] ModelProductsDto model) {
             bool products = await service.AddProductsAsync(model);
             return ResultsValidator.CreatedResult(products);
         }
 
+        public static async Task<IResult> PatchProduct(ProductsService service, [FromBody] ModelProductsUpdate model) {
+            bool isProductUpdated = await service.PatchProduct(model);
+            return ResultsValidator.UpdatedResult(isProductUpdated);
+        }
 
 
-
+        public static async Task<IResult> DeleteProduct(ProductsService service, [FromRoute] int id) {
+            bool isProductDeleted = await service.DeleteProduct(id);
+            return ResultsValidator.DeletedResult(isProductDeleted);
+        }
 
     }
 }
