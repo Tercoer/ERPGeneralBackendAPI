@@ -48,6 +48,7 @@ builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<RolePermissionService>();
 builder.Services.AddScoped<ProductsService>();
+builder.Services.AddScoped<CategoryService>();
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -108,8 +109,8 @@ app.MapGet("/recursoPrivado", [Authorize](ClaimsPrincipal user) => {
 app.MapUserEndpoints();
 app.MapRoleEndpoints();
 app.MapPermissionEndpoints();
-app.MapProductsEndPoint();
-
+app.MapProductsEndPoints();
+app.MapCategoryEndpoints();
 app.Run();
 
 /*########################        SIGUIENTES PASOS            #############################

@@ -22,32 +22,32 @@ namespace SistemaGeneral.EndPoints {
 
         private static async Task<IResult> AddUser(UserService service, [FromBody] ModelUserAddDto model) {
             bool isUserCreated = await service.AddUserAsync(model);
-            return ResultsValidator.CreatedResult(isUserCreated);
+            return Validator.CreatedResult(isUserCreated);
         }
 
         private static async Task<IResult> GetUser(UserService service, [FromRoute] int id) {
             ModelUserInfoDto? user = await service.GetUserAsync(id);
-            return ResultsValidator.GetResult(user);
+            return Validator.GetResult(user);
         }
 
         private static async Task<IResult> GetUsers(UserService service) {
             IEnumerable<ModelUserInfoDto> users = await service.GetUsersAsync();
-            return ResultsValidator.GetResult(users);
+            return Validator.GetResult(users);
         }
 
         public static async Task<IResult> PatchUser(UserService users, [FromBody] ModelUserUpdateInputDto model) {
             bool isUserUpdated = await users.PatchUserAsync(model);
-            return ResultsValidator.UpdatedResult(isUserUpdated);
+            return Validator.UpdatedResult(isUserUpdated);
         }
 
         public static async Task<IResult> PatchUserRole(UserService users, [FromBody] PatchModelUserRoleDto model) {
             bool isUserRoleUpdated = await users.PatchUserRoleAsync(model);
-            return ResultsValidator.UpdatedResult(isUserRoleUpdated);
+            return Validator.UpdatedResult(isUserRoleUpdated);
         }
 
         public static async Task<IResult> DeleteUser(UserService users, [FromRoute] int id) {
             bool isUserDeleted = await users.DeleteUserAsync(id);
-            return ResultsValidator.DeletedResult(isUserDeleted);
+            return Validator.DeletedResult(isUserDeleted);
 
         }
 

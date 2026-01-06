@@ -7,7 +7,7 @@ using SistemaGeneral.Utility;
 namespace SistemaGeneral.EndPoints {
     public static class Products {
         
-        public static RouteGroupBuilder MapProductsEndPoint(this IEndpointRouteBuilder app) {
+        public static RouteGroupBuilder MapProductsEndPoints(this IEndpointRouteBuilder app) {
             RouteGroupBuilder group = app.MapGroup("/products");
             group.MapGet("/", GetProducts);
             group.MapGet("/{id}", GetProductByID);
@@ -19,27 +19,27 @@ namespace SistemaGeneral.EndPoints {
         
         public static async Task<IResult> GetProducts(ProductsService service) {
             IEnumerable<ModelProducts> products = await service.GetProductsAsync();
-            return ResultsValidator.GetResult(products);
+            return Validator.GetResult(products);
         }
         public static async Task<IResult> GetProductByID(ProductsService service, int id) {
             ModelProducts product = await service.GetProductByID(id);
-            return ResultsValidator.GetResult(product);
+            return Validator.GetResult(product);
         }
 
         public static async Task<IResult> AddProduct(ProductsService service, [FromBody] ModelProductsDto model) {
             bool products = await service.AddProductsAsync(model);
-            return ResultsValidator.CreatedResult(products);
+            return Validator.CreatedResult(products);
         }
 
         public static async Task<IResult> PatchProduct(ProductsService service, [FromBody] ModelProductsUpdate model) {
             bool isProductUpdated = await service.PatchProduct(model);
-            return ResultsValidator.UpdatedResult(isProductUpdated);
+            return Validator.UpdatedResult(isProductUpdated);
         }
 
 
         public static async Task<IResult> DeleteProduct(ProductsService service, [FromRoute] int id) {
             bool isProductDeleted = await service.DeleteProduct(id);
-            return ResultsValidator.DeletedResult(isProductDeleted);
+            return Validator.DeletedResult(isProductDeleted);
         }
 
     }

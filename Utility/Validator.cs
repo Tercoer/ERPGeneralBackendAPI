@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections;
+using System.Reflection;
 
 namespace SistemaGeneral.Utility {
-    public class ResultsValidator {
+    public class Validator {
+
 
         public static IResult GetResult<T>(T resultFromDb) {
             if(resultFromDb == null)
@@ -31,6 +33,7 @@ namespace SistemaGeneral.Utility {
             ));
 
         }
+
 
         private static ProblemDetails CreateProblem(int status, string title) {
             return new ProblemDetails {
