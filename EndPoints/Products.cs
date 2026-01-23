@@ -19,27 +19,27 @@ namespace SistemaGeneral.EndPoints {
         
         public static async Task<IResult> GetProducts(ProductsService service) {
             IEnumerable<ModelProducts> products = await service.GetProductsAsync();
-            return Validator.GetResult(products);
+            return ResultsValidator.GetResult(products);
         }
         public static async Task<IResult> GetProductByID(ProductsService service, int id) {
             ModelProducts product = await service.GetProductByID(id);
-            return Validator.GetResult(product);
+            return ResultsValidator.GetResult(product);
         }
 
         public static async Task<IResult> AddProduct(ProductsService service, [FromBody] ModelProductsDto model) {
             bool products = await service.AddProductsAsync(model);
-            return Validator.CreatedResult(products);
+            return ResultsValidator.CreatedResult(products);
         }
 
         public static async Task<IResult> PatchProduct(ProductsService service, [FromBody] ModelProductsUpdate model) {
             bool isProductUpdated = await service.PatchProduct(model);
-            return Validator.UpdatedResult(isProductUpdated);
+            return ResultsValidator.UpdatedResult(isProductUpdated);
         }
 
 
         public static async Task<IResult> DeleteProduct(ProductsService service, [FromRoute] int id) {
             bool isProductDeleted = await service.DeleteProduct(id);
-            return Validator.DeletedResult(isProductDeleted);
+            return ResultsValidator.DeletedResult(isProductDeleted);
         }
 
     }

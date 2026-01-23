@@ -3,7 +3,7 @@ using System.Collections;
 using System.Reflection;
 
 namespace SistemaGeneral.Utility {
-    public class Validator {
+    public class ResultsValidator {
 
 
         public static IResult GetResult<T>(T resultFromDb) {
@@ -33,7 +33,7 @@ namespace SistemaGeneral.Utility {
             ));
 
         }
-
+ 
 
         private static ProblemDetails CreateProblem(int status, string title) {
             return new ProblemDetails {

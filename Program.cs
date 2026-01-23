@@ -49,6 +49,7 @@ builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<RolePermissionService>();
 builder.Services.AddScoped<ProductsService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<CategoryTypeService>();
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -111,6 +112,7 @@ app.MapRoleEndpoints();
 app.MapPermissionEndpoints();
 app.MapProductsEndPoints();
 app.MapCategoryEndpoints();
+app.MapCategorieTypesEndpoints();
 app.Run();
 
 /*########################        SIGUIENTES PASOS            #############################

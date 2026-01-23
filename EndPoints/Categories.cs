@@ -21,17 +21,17 @@ namespace SistemaGeneral.EndPoints {
 
         private static async Task<IResult> GetCategories(CategoryService service) {
             IEnumerable category = await service.GetCategoriesAsync();
-            return Validator.GetResult(category);
+            return ResultsValidator.GetResult(category);
         }
 
         private static async Task<IResult> GetCategory(CategoryService service, [FromRoute]short id) {
             ModelCategory? category = await service.GetCategoryAsync(id);
-            return Validator.GetResult(category);
+            return ResultsValidator.GetResult(category);
         }
 
         private static async Task<IResult> CreateCategory(CategoryService service, [FromBody] ModelCategoryDTO model) {
             bool IsCategoryAdded = await service.CreateCategoryAsync(model);
-            return Validator.CreatedResult(IsCategoryAdded);
+            return ResultsValidator.CreatedResult(IsCategoryAdded);
         }
 
         private static async Task<IResult> UpdateCategory(CategoryService service, [FromRoute]short id, [FromBody] ModelCategory model) {
@@ -42,12 +42,12 @@ namespace SistemaGeneral.EndPoints {
                 });
             } 
             bool IsCategoryUpdated = await service.UpdateCategoryAsync(model);
-            return Validator.UpdatedResult(IsCategoryUpdated);
+            return ResultsValidator.UpdatedResult(IsCategoryUpdated);
         }
 
         private static async Task<IResult> DeleteCategory(CategoryService service, [FromRoute] short id){
             bool IsCategoryDeleted = await service.DeleteCategoryAsync(id);
-            return Validator.DeletedResult(IsCategoryDeleted);
+            return ResultsValidator.DeletedResult(IsCategoryDeleted);
         }
 
 
